@@ -11,6 +11,12 @@ namespace ledc {
 static const char *TAG = "ledc.output";
 
 void LEDCOutput::write_state(float state) {
+  if (!this->setup_ran) {
+    ESP_LOGW(TAG, "setup() did not run yet, storing state %f.", state);
+    saved_state = state;
+    saved_state_valid = true;
+    return;
+  }
   if (this->pin_->is_inverted())
     state = 1.0f - state;
 
@@ -26,6 +32,11 @@ void LEDCOutput::setup() {
   this->turn_off();
   // Attach pin after setting default value
   ledcAttachPin(this->pin_->get_pin(), this->channel_);
+  this->setup_ran = true;
+  if (this->saved_state_valid) {
+    ESP_LOGW(TAG, "State saved before. Applying: %f.", this->saved_state);
+    this->write_state(this->saved_state);
+  }
 }
 
 void LEDCOutput::dump_config() {
