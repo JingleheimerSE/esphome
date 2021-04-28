@@ -36,6 +36,9 @@ class LEDCOutput : public output::FloatOutput, public Component {
   uint8_t bit_depth_{};
   float frequency_{};
   float duty_{0.0f};
+  bool setup_ran = false;
+  float saved_state;
+  bool saved_state_valid = false;
 };
 
 template<typename... Ts> class SetFrequencyAction : public Action<Ts...> {
